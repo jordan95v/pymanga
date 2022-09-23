@@ -1,9 +1,9 @@
+import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
 from datetime import datetime
 import httpx
-import re
+import requests_html
+from requests import HTTPError
 from lxml import etree
 from core.models.manga import Chapter, Manga
 
@@ -57,10 +57,34 @@ class Client:
             try:
                 res.raise_for_status()
             except httpx.HTTPError:
-                print("[ERROR] Request ended in 404 error.")
+                print("[ERROR] Provided URL resulted in a 404 error.")
             else:
                 try:
                     xml: etree._Element = etree.fromstring(res.text)
                     return await self._parse_xml(xml)
                 except etree.XMLSyntaxError:
-                    print("[ERROR] Bad XML, cannot parse.")
+                    print("[ERROR] Cannot parse provided XML.")
+
+    async def get_chapter_image(self, url: str) -> list[str]:
+        """Get all the images link for a chapter, i know it use requests instead of
+        httpx, but i had to in order to run the javascript.
+
+        Args:
+            url: Url of the chpater
+
+        Return:
+            list[str]: List of all the images links.
+        """
+
+        session: requests_html.AsyncHTMLSession = requests_html.AsyncHTMLSession()
+        try:
+            res: requests_html.HTMLResponse = await session.get(url)
+            res.raise_for_status()
+        except HTTPError:
+            print("[ERROR] Provided URL resulted in a 404 error.")
+        else:
+            await res.html.arender(timeout=60)
+            images: list[requests_html.Element] = res.html.find(".img-fluid")
+            print(images)
+            await session.close()
+            return sorted([element.attrs.get("src") for element in images])

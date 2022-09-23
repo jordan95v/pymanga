@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from conftest import MockResponse
 from core.client import Client
 from lxml import etree
-
+from requests_html import AsyncHTMLSession
 from core.models.manga import Manga
 
 
@@ -45,4 +45,27 @@ class TestClient:
         assert (
             ret.chapters[0].link
             == "https://mangasee123.com/read-online/Naruto-chapter-1.html"
+        )
+
+    @pytest.mark.asyncio
+    async def test_get_chapter_image(self, mocker: MockerFixture) -> None:
+        async def patch_html(*args: Any, **kwargs: Any) -> None:
+            return MockResponse(200)
+
+        client: Client = Client()
+        mocker.patch.object(AsyncHTMLSession, "get", patch_html)
+        ret: list[str] = await client.get_chapter_image(
+            "https://mangasee123.com/read-online/Mato-Seihei-No-Slave-chapter-91.html",
+        )
+        assert ret == ["naruto", "sasuke"]
+
+    @pytest.mark.asyncio
+    async def test_get_chapter_image_error(self, mocker: MockerFixture) -> None:
+        async def patch_html(*args: Any, **kwargs: Any) -> None:
+            return MockResponse(401)
+
+        client: Client = Client()
+        mocker.patch.object(AsyncHTMLSession, "get", patch_html)
+        ret: list[str] = await client.get_chapter_image(
+            "https://mangasee123.com/read-online/Mato-Seihei-No-Slave-chapter-91.html",
         )
