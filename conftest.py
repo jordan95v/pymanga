@@ -4,6 +4,8 @@ from typing import Any
 import httpx
 from requests import HTTPError
 
+__all__: list[str] = ["MockResponse", "MockElement", "MockHTML"]
+
 
 @dataclass
 class MockElement:

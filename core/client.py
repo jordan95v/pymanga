@@ -85,6 +85,5 @@ class Client:
         else:
             await res.html.arender(timeout=60)
             images: list[requests_html.Element] = res.html.find(".img-fluid")
-            print(images)
             await session.close()
             return sorted([element.attrs.get("src") for element in images])

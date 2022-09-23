@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+__all__: list[str] = ["Chapter", "Manga"]
+
 
 @dataclass
 class Chapter:
