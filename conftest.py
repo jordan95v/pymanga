@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+import requests
 import httpx
-from requests import HTTPError
+from core.utils.exceptions import MangaNotFound
 
 __all__: list[str] = ["MockResponse", "MockElement", "MockHTML"]
 
@@ -31,16 +32,13 @@ class MockResponse:
 
     def raise_for_status(self) -> None:
         if self.status_code == 404:
-            raise httpx.HTTPError("Error")
+            raise httpx.HTTPError("yo")
         elif self.status_code == 401:
-            raise HTTPError
+            raise requests.HTTPError()
 
     @property
     def text(self) -> str:
-        if self.status_code != 200:
-            return "holla, the xml parser cannot parse me bhahahaha"
-        else:
-            return Path("tests/samples/naruto.xml").read_text(encoding="utf8")
+        return Path("tests/samples/naruto.xml").read_text(encoding="utf8")
 
     @property
     def html(self) -> MockHTML:

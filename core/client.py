@@ -1,11 +1,18 @@
+import asyncio
+from pathlib import Path
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from types import TracebackType
+from typing import Type
+from typing_extensions import Self
+from zipfile import ZipFile
 import httpx
 import requests_html
 from requests import HTTPError
 from lxml import etree
 from core.models.manga import Chapter, Manga
+from core.utils.exceptions import ChapterNotFound, MangaNotFound
 
 __all__: list[str] = ["Client"]
 
@@ -13,6 +20,7 @@ __all__: list[str] = ["Client"]
 @dataclass
 class Client:
     base_url: str = "https://mangasee123.com/rss/"
+    session: httpx.AsyncClient = httpx.AsyncClient()
 
     async def _parse_xml(self, xml: etree._Element) -> Manga:
         """Parse the XML from MangaSee and retrieve info.
@@ -50,27 +58,23 @@ class Client:
             Manga: The dataclass with extracted info.
         """
 
-        async with httpx.AsyncClient() as client:
-            res: httpx.Response = await client.get(
-                f"{self.base_url}{'-'.join(name.split())}.xml"
-            )
-            try:
-                res.raise_for_status()
-            except httpx.HTTPError:
-                print("[ERROR] Provided URL resulted in a 404 error.")
-            else:
-                try:
-                    xml: etree._Element = etree.fromstring(res.text)
-                    return await self._parse_xml(xml)
-                except etree.XMLSyntaxError:
-                    print("[ERROR] Cannot parse provided XML.")
+        res: httpx.Response = await self.session.get(
+            f"{self.base_url}{'-'.join(name.split())}.xml"
+        )
+        try:
+            res.raise_for_status()
+        except httpx.HTTPError:
+            raise MangaNotFound()
+        else:
+            xml: etree._Element = etree.fromstring(res.text)
+            return await self._parse_xml(xml)
 
     async def get_chapter_image(self, url: str) -> list[str]:
         """Get all the images link for a chapter, i know it use requests instead of
         httpx, but i had to in order to run the javascript.
 
         Args:
-            url: Url of the chpater
+            url: Url of the chapter
 
         Return:
             list[str]: List of all the images links.
@@ -81,10 +85,26 @@ class Client:
             res: requests_html.HTMLResponse = await session.get(url)
             res.raise_for_status()
         except HTTPError:
-            print("[ERROR] Provided URL resulted in a 404 error.")
+            raise ChapterNotFound()
         else:
             print(f"[WORKING] Retrieving images links for: {url}")
             await res.html.arender(timeout=0)  # Disable timeout, page able to load :)
             images: list[requests_html.Element] = res.html.find(".img-fluid")
             await session.close()
             return sorted([element.attrs.get("src") for element in images])
+
+    async def close(self) -> None:
+        await self.session.aclose()
+
+    async def __aenter__(self) -> Self:
+        return self
+
+    async def __aexit__(
+        self,
+        err_type: Type[Exception] | None,
+        err_value: Exception | None,
+        tb: TracebackType | None,
+    ) -> None:
+        await self.close()
+        if err_type:
+            raise err_type(err_value)
