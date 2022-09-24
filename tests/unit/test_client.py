@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock
 import pytest
 import httpx
@@ -7,9 +6,8 @@ from pytest_mock import MockerFixture
 from conftest import MockResponse
 from core.client import Client
 from lxml import etree
-from requests_html import AsyncHTMLSession
 from core.models.manga import Manga
-from core.utils.exceptions import ChapterNotFound, MangaNotFound
+from core.utils.exceptions import MangaNotFound
 
 
 @pytest.fixture
@@ -79,30 +77,8 @@ class TestClient:
             == "https://mangasee123.com/read-online/Naruto-chapter-1.html"
         )
 
-    @pytest.mark.parametrize(
-        "status_code, throwable", [(200, None), (401, ChapterNotFound)]
-    )
     @pytest.mark.asyncio
-    async def test_get_chapter_image(
-        self,
-        client: Client,
-        status_code: int,
-        throwable: Exception | None,
-        mocker: MockerFixture,
+    async def test_download_image(
+        self, client: Client, mocker: MockerFixture, tmp_path: Path
     ) -> None:
-        async def patch_html(*args: Any, **kwargs: Any) -> None:
-            return MockResponse(status_code)
-
-        mocker.patch.object(AsyncHTMLSession, "get", patch_html)
-        close_js_spy: MagicMock = mocker.spy(AsyncHTMLSession, "close")
-        if throwable:
-            with pytest.raises(throwable):
-                await client.get_chapter_image(
-                    "https://mangasee123.com/read-online/Naruto-chapter-1.html",
-                )
-        else:
-            ret: list[str] = await client.get_chapter_image(
-                "https://mangasee123.com/read-online/Naruto-chapter-1.html",
-            )
-            assert ret == ["naruto", "sasuke"]
-            assert close_js_spy.call_count == 1
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))

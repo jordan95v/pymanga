@@ -68,30 +68,6 @@ class Client:
             xml: etree._Element = etree.fromstring(res.text)
             return await self._parse_xml(xml)
 
-    async def get_chapter_image(self, url: str) -> list[str]:
-        """Get all the images link for a chapter, i know it use requests-html instead of
-        httpx, but i had to in order to run the javascript.
-
-        Args:
-            url: Url of the chapter
-
-        Return:
-            list[str]: List of all the images links.
-        """
-
-        js_session: AsyncHTMLSession = AsyncHTMLSession()
-        try:
-            res: HTMLResponse = await js_session.get(url)
-            res.raise_for_status()
-        except HTTPError:
-            raise ChapterNotFound()
-        else:
-            print(f"[WORKING] Retrieving images links for: {url}")
-            await res.html.arender(timeout=0)  # Disable timeout, page able to load :)
-            images: list[Element] = res.html.find(".img-fluid")
-            await js_session.close()
-            return sorted([element.attrs.get("src") for element in images])
-
     async def close(self) -> None:
         """Close the httpx and requests-html session."""
 

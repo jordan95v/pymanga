@@ -41,5 +41,9 @@ class MockResponse:
         return Path("tests/samples/naruto.xml").read_text(encoding="utf8")
 
     @property
+    def content(self) -> bytes:
+        return b"hello joaquim"
+
+    @property
     def html(self) -> MockHTML:
         return MockHTML()
