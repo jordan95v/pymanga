@@ -6,9 +6,8 @@ from datetime import datetime
 from types import TracebackType
 from typing import Type
 from typing_extensions import Self
-from zipfile import ZipFile
 import httpx
-import requests_html
+from requests_html import AsyncHTMLSession, Element, HTMLResponse
 from requests import HTTPError
 from lxml import etree
 from core.models.manga import Chapter, Manga
@@ -70,7 +69,7 @@ class Client:
             return await self._parse_xml(xml)
 
     async def get_chapter_image(self, url: str) -> list[str]:
-        """Get all the images link for a chapter, i know it use requests instead of
+        """Get all the images link for a chapter, i know it use requests-html instead of
         httpx, but i had to in order to run the javascript.
 
         Args:
@@ -80,20 +79,22 @@ class Client:
             list[str]: List of all the images links.
         """
 
-        session: requests_html.AsyncHTMLSession = requests_html.AsyncHTMLSession()
+        js_session: AsyncHTMLSession = AsyncHTMLSession()
         try:
-            res: requests_html.HTMLResponse = await session.get(url)
+            res: HTMLResponse = await js_session.get(url)
             res.raise_for_status()
         except HTTPError:
             raise ChapterNotFound()
         else:
             print(f"[WORKING] Retrieving images links for: {url}")
             await res.html.arender(timeout=0)  # Disable timeout, page able to load :)
-            images: list[requests_html.Element] = res.html.find(".img-fluid")
-            await session.close()
+            images: list[Element] = res.html.find(".img-fluid")
+            await js_session.close()
             return sorted([element.attrs.get("src") for element in images])
 
     async def close(self) -> None:
+        """Close the httpx and requests-html session."""
+
         await self.session.aclose()
 
     async def __aenter__(self) -> Self:

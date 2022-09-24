@@ -31,7 +31,6 @@ class TestClient:
 
     @pytest.mark.asyncio
     async def test__aexit__error(self, client: Client, mocker: MockerFixture) -> None:
-        close_spy: MagicMock = mocker.spy(httpx.AsyncClient, "aclose")
         with pytest.raises(TypeError):
             await client.__aexit__(TypeError, "yo", None)
 
@@ -95,6 +94,7 @@ class TestClient:
             return MockResponse(status_code)
 
         mocker.patch.object(AsyncHTMLSession, "get", patch_html)
+        close_js_spy: MagicMock = mocker.spy(AsyncHTMLSession, "close")
         if throwable:
             with pytest.raises(throwable):
                 await client.get_chapter_image(
@@ -105,3 +105,4 @@ class TestClient:
                 "https://mangasee123.com/read-online/Naruto-chapter-1.html",
             )
             assert ret == ["naruto", "sasuke"]
+            assert close_js_spy.call_count == 1
