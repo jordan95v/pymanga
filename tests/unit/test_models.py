@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -77,3 +78,15 @@ class TestChapter:
         await chapter.download_images(tmp_path)
         output: Path = tmp_path / f"{chapter.title}.zip"
         assert output.exists()
+
+    @pytest.mark.asyncio
+    async def test_call(self, chapter: Chapter, mocker: MockerFixture) -> None:
+        sem: asyncio.Semaphore = asyncio.Semaphore(10)
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
+        acquire_spy: MagicMock = mocker.spy(sem, "acquire")
+        release_spy: MagicMock = mocker.spy(sem, "release")
+        async with httpx.AsyncClient() as client:
+            ret: httpx.Response = await chapter._call("hello", client, sem)
+        assert acquire_spy.call_count == 1
+        assert release_spy.call_count == 1
+        assert ret.content == b"hello joaquim"
