@@ -1,5 +1,3 @@
-import asyncio
-from pathlib import Path
 import re
 from dataclasses import dataclass
 from datetime import datetime
@@ -7,11 +5,9 @@ from types import TracebackType
 from typing import Type
 from typing_extensions import Self
 import httpx
-from requests_html import AsyncHTMLSession, Element, HTMLResponse
-from requests import HTTPError
 from lxml import etree
 from core.models.manga import Chapter, Manga
-from core.utils.exceptions import ChapterNotFound, MangaNotFound
+from core.utils.exceptions import MangaNotFound
 
 __all__: list[str] = ["Client"]
 
