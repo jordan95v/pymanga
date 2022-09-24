@@ -83,7 +83,8 @@ class Client:
         except HTTPError:
             print("[ERROR] Provided URL resulted in a 404 error.")
         else:
-            await res.html.arender(timeout=60)
+            print(f"[WORKING] Retrieving images links for: {url}")
+            await res.html.arender(timeout=0)  # Disable timeout, page able to load :)
             images: list[requests_html.Element] = res.html.find(".img-fluid")
             await session.close()
             return sorted([element.attrs.get("src") for element in images])

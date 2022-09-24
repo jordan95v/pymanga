@@ -55,7 +55,7 @@ class TestClient:
         client: Client = Client()
         mocker.patch.object(AsyncHTMLSession, "get", patch_html)
         ret: list[str] = await client.get_chapter_image(
-            "https://mangasee123.com/read-online/Mato-Seihei-No-Slave-chapter-91.html",
+            "https://mangasee123.com/read-online/Naruto-chapter-1.html",
         )
         assert ret == ["naruto", "sasuke"]
 
@@ -67,5 +67,5 @@ class TestClient:
         client: Client = Client()
         mocker.patch.object(AsyncHTMLSession, "get", patch_html)
         ret: list[str] = await client.get_chapter_image(
-            "https://mangasee123.com/read-online/Mato-Seihei-No-Slave-chapter-91.html",
+            "https://mangasee123.com/read-online/Naruto-chapter-1.html",
         )
