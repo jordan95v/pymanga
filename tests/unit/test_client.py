@@ -76,9 +76,3 @@ class TestClient:
             ret.chapters[0].link
             == "https://mangasee123.com/read-online/Naruto-chapter-1.html"
         )
-
-    @pytest.mark.asyncio
-    async def test_download_image(
-        self, client: Client, mocker: MockerFixture, tmp_path: Path
-    ) -> None:
-        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
