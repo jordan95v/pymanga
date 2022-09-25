@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 import requests
 import httpx
-from core.utils.exceptions import MangaNotFound
 
 __all__: list[str] = ["MockResponse", "MockElement", "MockHTML"]
 

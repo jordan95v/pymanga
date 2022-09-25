@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
@@ -7,7 +8,7 @@ from pytest_mock import MockerFixture
 from conftest import MockResponse
 from core.client import Client
 from lxml import etree
-from core.models.manga import Manga
+from core.models.manga import Chapter, Manga
 from core.utils.exceptions import MangaNotFound, ParsingError
 
 
@@ -104,3 +105,30 @@ class TestClient:
         xml: etree._Element = etree.fromstring("<xml><a>Hello</a></xml>")
         with pytest.raises(ParsingError):
             await client._parse_xml(xml=xml)
+
+    @pytest.mark.asyncio
+    async def test_download_image(
+        self, client: Client, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        chapter: Chapter = Chapter()
+
+        async def patch_images() -> list[str]:
+            return ["hello.jpg", "joaquim.jpg"]
+
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
+        mocker.patch.object(Chapter, "images_links", side_effect=patch_images)
+
+        await client.download_images(tmp_path, chapter)
+        output: Path = tmp_path / f"{chapter.title}.cbz"
+        assert output.exists()
+
+    @pytest.mark.asyncio
+    async def test_call(self, client: Client, mocker: MockerFixture) -> None:
+        sem: asyncio.Semaphore = asyncio.Semaphore(10)
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
+        acquire_spy: MagicMock = mocker.spy(sem, "acquire")
+        release_spy: MagicMock = mocker.spy(sem, "release")
+        ret: httpx.Response = await client._call("hello", sem)
+        assert acquire_spy.call_count == 1
+        assert release_spy.call_count == 1
+        assert ret.content == b"hello joaquim"

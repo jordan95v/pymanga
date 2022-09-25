@@ -1,25 +1,14 @@
 import asyncio
 from datetime import datetime
 from multiprocessing import managers
-from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 import pytest
-import httpx
 from pytest_mock import MockerFixture
 from conftest import MockResponse
 from requests_html import AsyncHTMLSession
 from core.models.manga import Manga, Chapter
 from core.utils.exceptions import ChapterNotFound
-
-
-@pytest.fixture
-def chapter() -> Chapter:
-    return Chapter(
-        title="Jujutsu 01",
-        link="Jujutsu 01/Scan",
-        publication_date=datetime(2022, 9, 23),
-    )
 
 
 class TestManga:
@@ -56,11 +45,12 @@ class TestChapter:
     @pytest.mark.asyncio
     async def test_get_chapter_image(
         self,
-        chapter: Chapter,
         status_code: int,
         throwable: Exception | None,
         mocker: MockerFixture,
     ) -> None:
+        chapter: Chapter = Chapter()
+
         async def patch_html(*args: Any, **kwargs: Any) -> None:
             return MockResponse(status_code)
 
@@ -73,29 +63,3 @@ class TestChapter:
             ret: list[str] = await chapter.images_links()
             assert ret == ["naruto", "sasuke"]
             assert close_js_spy.call_count == 1
-
-    @pytest.mark.asyncio
-    async def test_download_image(
-        self, chapter: Chapter, mocker: MockerFixture, tmp_path: Path
-    ) -> None:
-        async def patch_images() -> list[str]:
-            return ["hello.jpg", "joaquim.jpg"]
-
-        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
-        mocker.patch.object(Chapter, "images_links", side_effect=patch_images)
-
-        await chapter.download_images(tmp_path)
-        output: Path = tmp_path / f"{chapter.title}.cbz"
-        assert output.exists()
-
-    @pytest.mark.asyncio
-    async def test_call(self, chapter: Chapter, mocker: MockerFixture) -> None:
-        sem: asyncio.Semaphore = asyncio.Semaphore(10)
-        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
-        acquire_spy: MagicMock = mocker.spy(sem, "acquire")
-        release_spy: MagicMock = mocker.spy(sem, "release")
-        async with httpx.AsyncClient() as client:
-            ret: httpx.Response = await chapter._call("hello", client, sem)
-        assert acquire_spy.call_count == 1
-        assert release_spy.call_count == 1
-        assert ret.content == b"hello joaquim"

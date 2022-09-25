@@ -70,11 +70,12 @@ async def main() -> None:
         res: Manga = await client.get_manga_info("One Piece")
         output: Path = Path('One Piece')
         output.mkdir(exists_ok = True)
-        await res.chapters[0].download_images(output, limit=25)
+        await client.download_images(output, res.chapters[0], limit=25)
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-⚠️ The parameter `limit` is here to limit the number of connections. 
-If you download too much images at the same time, your connection might not be enought and the script will raise an error ! ⚠️
+⚠️ The parameter `limit` is here to limit the number of images downloaded at the same time. 
+If the number is high, your connection might not be enought and the script will raise an error !
+So yu might lower it down, but if you got a fast connection, it's clown fiesta ! ⚠️
