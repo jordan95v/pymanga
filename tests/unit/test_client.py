@@ -7,7 +7,7 @@ from conftest import MockResponse
 from core.client import Client
 from lxml import etree
 from core.models.manga import Manga
-from core.utils.exceptions import MangaNotFound
+from core.utils.exceptions import MangaNotFound, ParsingError
 
 
 @pytest.fixture
@@ -76,3 +76,9 @@ class TestClient:
             ret.chapters[0].link
             == "https://mangasee123.com/read-online/Naruto-chapter-1.html"
         )
+
+    @pytest.mark.asyncio
+    async def test_parse_xml_none(self, client: Client) -> None:
+        xml: etree._Element = etree.fromstring("<xml><a>Hello</a></xml>")
+        with pytest.raises(ParsingError):
+            await client._parse_xml(xml=xml)

@@ -7,7 +7,7 @@ from typing_extensions import Self
 import httpx
 from lxml import etree
 from core.models.manga import Chapter, Manga
-from core.utils.exceptions import MangaNotFound
+from core.utils.exceptions import MangaNotFound, ParsingError
 
 __all__: list[str] = ["Client"]
 
@@ -27,21 +27,25 @@ class Client:
             Manga: The dataclass with extracted info.
         """
 
-        link: str = xml.xpath("/rss/channel/link/text()")[0]
-        title: str = " ".join(link.split("/")[-1].split("-"))
-        image: str = xml.xpath("/rss/channel/image/url/text()")[0]
-        items: list[etree._Element] = xml.xpath("/rss/channel/item")
-        chapters: list[Chapter] = [
-            Chapter(
-                title=item.findtext("title"),
-                link=re.sub(r"-page-\d+", "", item.findtext("link")),
-                publication_date=datetime.strptime(
-                    item.findtext("pubDate"), "%a, %d %b %Y %H:%M:%S %z"
-                ),
-            )
-            for item in items
-        ]
-        return Manga(title=title, link=link, image=image, chapters=chapters[::-1])
+        try:
+            link: str = xml.xpath("/rss/channel/link/text()")[0]
+            title: str = " ".join(link.split("/")[-1].split("-"))
+            image: str = xml.xpath("/rss/channel/image/url/text()")[0]
+            items: list[etree._Element] = xml.xpath("/rss/channel/item")
+            chapters: list[Chapter] = [
+                Chapter(
+                    title=item.findtext("title"),
+                    link=re.sub(r"-page-\d+", "", item.findtext("link")),
+                    publication_date=datetime.strptime(
+                        item.findtext("pubDate"), "%a, %d %b %Y %H:%M:%S %z"
+                    ),
+                )
+                for item in items
+            ]
+        except IndexError:
+            raise ParsingError()
+        else:
+            return Manga(title=title, link=link, image=image, chapters=chapters[::-1])
 
     async def get_manga_info(self, name: str) -> Manga:
         """Get any scan info available on MangaSee RSS feed.

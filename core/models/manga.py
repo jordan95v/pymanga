@@ -55,9 +55,8 @@ class Chapter:
             httpx.Response: Response from the request.
         """
 
-        await sem.acquire()
-        res: httpx.Response = await client.get(url)
-        sem.release()
+        async with sem:
+            res: httpx.Response = await client.get(url)
         return res
 
     async def download_images(self, path: Path, *, limit: int = 10) -> Path:
@@ -73,13 +72,13 @@ class Chapter:
         """
 
         images_links: list[str] = await self.images_links()
-        print(f"[DOWNLOAD] Downloading images links for: {self.title}")
+        print(f"[DOWNLOAD] Downloading images for: {self.title}")
         async with httpx.AsyncClient() as client:
             sem: asyncio.Semaphore = asyncio.Semaphore(limit)
             ret: list[httpx.Response] = await asyncio.gather(
                 *[self._call(url, client, sem) for url in images_links]
             )
-        output: Path = path / f"{self.title}.zip"
+        output: Path = path / f"{self.title}.cbz"
         with ZipFile(output, "w") as zp:
             for url, res in zip(images_links, ret):
                 zp.writestr(f"{url.rsplit('/')[-1]}", res.content)

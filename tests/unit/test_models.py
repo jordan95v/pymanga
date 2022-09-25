@@ -76,7 +76,7 @@ class TestChapter:
         mocker.patch.object(chapter, "images_links", side_effect=patch_images)
 
         await chapter.download_images(tmp_path)
-        output: Path = tmp_path / f"{chapter.title}.zip"
+        output: Path = tmp_path / f"{chapter.title}.cbz"
         assert output.exists()
 
     @pytest.mark.asyncio
