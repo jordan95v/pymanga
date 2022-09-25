@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock
 import pytest
 import httpx
@@ -64,18 +65,39 @@ class TestClient:
             assert ret.title == "Naruto"
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "status_code, throwable",
+        [
+            (200, None),
+            (404, MangaNotFound),
+        ],
+    )
+    async def test_get_info(
+        self,
+        client: Client,
+        status_code: int,
+        throwable: Exception | None,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch.object(
+            httpx.AsyncClient, "get", return_value=MockResponse(status_code)
+        )
+        if throwable:
+            with pytest.raises(MangaNotFound):
+                await client._get_info("Naruto")
+        else:
+            res: dict[str, Any] = await client._get_info("Naruto")
+            assert res["start_date"] == "1999-09-21"
+
+    @pytest.mark.asyncio
     async def test_parse_xml(self, client: Client) -> None:
         xml: etree._Element = etree.fromstring(
             Path("tests/samples/naruto.xml").read_text()
         )
         ret: Manga = await client._parse_xml(xml=xml)
-        assert ret.title == "Naruto"
-        assert ret.link == "https://mangasee123.com/manga/Naruto"
-        assert ret.chapters[0].title == "Naruto Chapter 1"
-        assert (
-            ret.chapters[0].link
-            == "https://mangasee123.com/read-online/Naruto-chapter-1.html"
-        )
+        assert ret["title"] == "Naruto"
+        assert ret["link"] == "https://mangasee123.com/manga/Naruto"
+        assert ret["chapters"][0].title == "Naruto Chapter 1"
 
     @pytest.mark.asyncio
     async def test_parse_xml_none(self, client: Client) -> None:

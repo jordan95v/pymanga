@@ -1,9 +1,10 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zipfile import ZipFile
 import httpx
+from pydantic import BaseModel
 from requests_html import AsyncHTMLSession, Element, HTMLResponse
 from requests import HTTPError
 from core.utils.exceptions import ChapterNotFound
@@ -11,8 +12,7 @@ from core.utils.exceptions import ChapterNotFound
 __all__: list[str] = ["Chapter", "Manga"]
 
 
-@dataclass
-class Chapter:
+class Chapter(BaseModel):
     title: str | None = None
     link: str | None = None
     publication_date: datetime | None = None
@@ -85,9 +85,11 @@ class Chapter:
         return output
 
 
-@dataclass
-class Manga:
+class Manga(BaseModel):
     title: str | None = None
     link: str | None = None
     image: str | None = None
     chapters: list[Chapter] | None = None
+    description: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None

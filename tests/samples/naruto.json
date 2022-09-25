@@ -1,0 +1,142 @@
+{
+    "data": [
+        {
+            "id": "35",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/35"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto",
+                "startDate": "1999-09-21",
+                "endDate": "2014-11-10",
+                "description": "Before Naruto's birth, a great demon fox had attacked the Hidden Leaf Village. A man known as the 4th Hokage sealed the demon inside the newly born Naruto, causing him to unknowingly grow up detested by his fellow villagers. Despite his lack of talent in many areas of ninjutsu, Naruto strives for only one goal: to gain the title of Hokage, the strongest ninja in his village. Desiring the respect he never received, Naruto works towards his dream with fellow friends Sasuke and Sakura and mentor Kakashi as they go through many trials and battles that come with being a ninja."
+            }
+        },
+        {
+            "id": "13786",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/13786"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto",
+                "startDate": "1997-08-01",
+                "endDate": "1997-08-01",
+                "description": "A one-shot manga by Kishimoto that was published in the August 1997 issue of Akamaru Jump which the now famous Naruto manga is based on."
+            }
+        },
+        {
+            "id": "36766",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/36766"
+            },
+            "attributes": {
+                "canonicalTitle": "Boruto: Naruto Next Generations",
+                "startDate": "2016-05-09",
+                "endDate": null,
+                "description": "Naruto was a young shinobi with an incorrigible knack for mischief. He achieved his dream to become the greatest ninja in the village and his face sits atop the Hokage monument. But this is not his story... A new generation of ninja are ready to take the stage, led by Naruto's own son, Boruto!\n\n(Source: VIZ Media)"
+            }
+        },
+        {
+            "id": "36702",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/36702"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto Shinden Series",
+                "startDate": "2015-09-04",
+                "endDate": "2015-11-04",
+                "description": "The story will focus on the brothers who have eyes that see through to the truth and who live on the threshold of hope and despair. Itachi's past and Sasuke's future will be made clear."
+            }
+        },
+        {
+            "id": "13179",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/13179"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto: Shiro no Douji, Keppu no Kijin",
+                "startDate": "2002-12-16",
+                "endDate": "2002-12-16",
+                "description": "Naruto, a born troublemaker, has the worst grades of anyone at Ninja Academy. But he has big dreams and swears that someday he'll be a respected warrior and the leader of his village! After barely graduating from the academy, Naruto officially becomes a full-fledged ninja and starts accepting assignments. He's thrilled about embarking on his first big job, a bodyguard mission, but his enthusiasm soon turns to panic when his group is ambushed by the powerful, vicious Demon Brothers. Can Naruto triumph over these fearsome foes?"
+            }
+        },
+        {
+            "id": "20055",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/20055"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto Ninden Series",
+                "startDate": "2010-08-04",
+                "endDate": "2015-08-04",
+                "description": "A whole village has suddenly disappeared and in its place, there is the mountain Hyatsuki. Can the story of the \"Jutsu of the moving mountains\" really be true? And where is Narutos old rival Renge? Naruto's job is it to find the answers to all these questions.\nNote: The novel is presented as if it were written by Jiraiya."
+            }
+        },
+        {
+            "id": "20349",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/20349"
+            },
+            "attributes": {
+                "canonicalTitle": "Road to Ninja: Naruto the Movie",
+                "startDate": "2012-07-18",
+                "endDate": "2012-07-18",
+                "description": "A special one-shot connected to the movie"
+            }
+        },
+        {
+            "id": "16985",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/16985"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto: Takigakure no Shitou Ore ga Hero dattebayo!",
+                "startDate": "2003-12-15",
+                "endDate": "2003-12-15",
+                "description": "It was supposed to be just an ordinary, C-rank assigment--but nothing about ninjutsu is as simple as it seems...\nSquad Seven's latest job is a real snore--escorting a young, cowardly leader named Shibuki back to the remote Hidden Waterfall Village. They arrive without a problem, but get stuck cleaning the village pond! While Naruto and his pals pick up the trash, Kakashi is called back to his home village on urgent business.\nThen, without warning, a brilliant rogue ninja shows up in tow with his evil henchmen. Suien desperately desires the Hidden Waterfall's most precious possession, a secret potion called the Hero's Water. And as Squad Seven quickly discovers, the guy will do absolutely anything to get it! With their fearless sensei gone, Naruto, Sasuke, and Sakura find themselves in the most deadly situation of their young lives.\n(Source: VIZ Media)"
+            }
+        },
+        {
+            "id": "35681",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/35681"
+            },
+            "attributes": {
+                "canonicalTitle": "Naruto Gaiden: Nanadaime Hokage to Akairo no Hanatsuzuki",
+                "startDate": "2015-04-27",
+                "endDate": "2015-07-06",
+                "description": "Naruto Gaiden: The Seventh Hokage and the Scarlet Spring is a sequel mini series to the original Naruto manga. The series will focus on Sarada Uchiha, Sasuke and Sakura's daughter, and the next generation of shinobi in Konohagakure."
+            }
+        },
+        {
+            "id": "37715",
+            "type": "manga",
+            "links": {
+                "self": "https://kitsu.io/api/edge/manga/37715"
+            },
+            "attributes": {
+                "canonicalTitle": "Boruto: Naruto the Movie",
+                "startDate": "2015-08-10",
+                "endDate": "2015-08-10",
+                "description": "Boruto is the son of the 7th Hokage Naruto who completely rejects his father. Behind this, he has feelings of wanting to surpass Naruto, who is respected as a hero. He ends up meeting his father's friend Sasuke, and requests to become... his apprentice!? The curtain on the story of the new generation written by Masashi Kishimoto rises!\n\n(Source: ANN)"
+            }
+        }
+    ],
+    "meta": {
+        "count": 740
+    },
+    "links": {
+        "first": "https://kitsu.io/api/edge/manga?fields%5Bmanga%5D=canonicalTitle%2CstartDate%2CendDate%2Cdescription&filter%5Btext%5D=Naruto&page%5Blimit%5D=10&page%5Boffset%5D=0",
+        "next": "https://kitsu.io/api/edge/manga?fields%5Bmanga%5D=canonicalTitle%2CstartDate%2CendDate%2Cdescription&filter%5Btext%5D=Naruto&page%5Blimit%5D=10&page%5Boffset%5D=10",
+        "last": "https://kitsu.io/api/edge/manga?fields%5Bmanga%5D=canonicalTitle%2CstartDate%2CendDate%2Cdescription&filter%5Btext%5D=Naruto&page%5Blimit%5D=10&page%5Boffset%5D=730"
+    }
+}

@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from types import TracebackType
-from typing import Type
+from typing import Any, Type
 from typing_extensions import Self
 import httpx
 from lxml import etree
@@ -31,7 +31,6 @@ class Client:
             link: str = xml.xpath("/rss/channel/link/text()")[0]
             title: str = " ".join(link.split("/")[-1].split("-"))
             image: str = xml.xpath("/rss/channel/image/url/text()")[0]
-            items: list[etree._Element] = xml.xpath("/rss/channel/item")
             chapters: list[Chapter] = [
                 Chapter(
                     title=item.findtext("title"),
@@ -40,14 +39,34 @@ class Client:
                         item.findtext("pubDate"), "%a, %d %b %Y %H:%M:%S %z"
                     ),
                 )
-                for item in items
+                for item in xml.xpath("/rss/channel/item")[::-1]
             ]
         except IndexError:
             raise ParsingError()
         else:
-            return Manga(title=title, link=link, image=image, chapters=chapters[::-1])
+            return dict(title=title, link=link, image=image, chapters=chapters)
 
-    async def get_manga_info(self, name: str) -> Manga:
+    async def _get_info(self, name: str) -> dict[str, str]:
+        try:
+            res: httpx.Response = await self.session.get(
+                f"https://kitsu.io/api/edge/manga",
+                params={
+                    "filter[text]": name,
+                    "fields[manga]": "startDate,endDate,description",
+                },
+            )
+            res.raise_for_status()
+        except httpx.HTTPError:
+            raise MangaNotFound()
+        else:
+            data: dict[str, Any] = res.json()["data"][0]["attributes"]
+            return dict(
+                description=data["description"],
+                start_date=data["startDate"],
+                end_date=data["endDate"],
+            )
+
+    async def get_manga_info(self, manga_name: str) -> Manga:
         """Get any scan info available on MangaSee RSS feed.
 
         Args:
@@ -56,17 +75,18 @@ class Client:
         Return:
             Manga: The dataclass with extracted info.
         """
-
-        res: httpx.Response = await self.session.get(
-            f"{self.base_url}{'-'.join(name.split())}.xml"
-        )
+        name: str = re.sub(r"[^\w]", " ", manga_name).replace("_", " ").title()
         try:
+            res: httpx.Response = await self.session.get(
+                f"{self.base_url}{'-'.join(name.split())}.xml"
+            )
             res.raise_for_status()
         except httpx.HTTPError:
             raise MangaNotFound()
         else:
-            xml: etree._Element = etree.fromstring(res.text)
-            return await self._parse_xml(xml)
+            rss_ret: dict[str, str] = await self._parse_xml(etree.fromstring(res.text))
+            kitsu_res: dict[str, str] = await self._get_info(name)
+            return Manga(**rss_ret, **kitsu_res)
 
     async def close(self) -> None:
         """Close the httpx and requests-html session."""
@@ -74,6 +94,8 @@ class Client:
         await self.session.aclose()
 
     async def __aenter__(self) -> Self:
+        """Context manager enter."""
+
         return self
 
     async def __aexit__(
@@ -82,6 +104,8 @@ class Client:
         err_value: Exception | None,
         tb: TracebackType | None,
     ) -> None:
+        """Context manager exit."""
+
         await self.close()
         if err_type:
             raise err_type(err_value)

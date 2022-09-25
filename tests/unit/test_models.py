@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from multiprocessing import managers
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
@@ -23,11 +24,19 @@ def chapter() -> Chapter:
 
 class TestManga:
     def test_manga_model(self) -> None:
-        manga: Manga = Manga(title="Naruto", link="Naruto/Scan", image="Naruto.jpg")
+        manga: Manga = Manga(
+            title="Naruto",
+            link="Naruto/Scan",
+            image="Naruto.jpg",
+            start_date="2022-09-25",
+        )
         assert manga.title == "Naruto"
         assert manga.link == "Naruto/Scan"
         assert manga.image == "Naruto.jpg"
         assert manga.chapters is None
+        assert manga.description is None
+        assert manga.start_date == datetime(2022, 9, 25).date()
+        assert manga.end_date is None
 
 
 class TestChapter:
@@ -73,7 +82,7 @@ class TestChapter:
             return ["hello.jpg", "joaquim.jpg"]
 
         mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
-        mocker.patch.object(chapter, "images_links", side_effect=patch_images)
+        mocker.patch.object(Chapter, "images_links", side_effect=patch_images)
 
         await chapter.download_images(tmp_path)
         output: Path = tmp_path / f"{chapter.title}.cbz"

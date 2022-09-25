@@ -5,6 +5,7 @@ It also allows you to download the scan 😎
 
 - [MANGA SCRAPER](#manga-scraper)
   - [Installation](#installation)
+  - [Coverage](#coverage)
   - [Workflow](#workflow)
     - [Get manga info](#get-manga-info)
     - [Download chapter images](#download-chapter-images)
@@ -23,6 +24,12 @@ C:/Users/you/manga_scraper> venv/Scripts/activate # venv\bin\activate on Mac
 ```
 
 And you're set to go !
+
+## Coverage
+
+Here is the `pytest` code coverage:
+
+![test_coverage](tests/test_coverage.png)
 
 ## Workflow
 

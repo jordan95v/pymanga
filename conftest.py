@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import json
 from pathlib import Path
 from typing import Any
 import requests
@@ -47,3 +48,6 @@ class MockResponse:
     @property
     def html(self) -> MockHTML:
         return MockHTML()
+
+    def json(self) -> dict[str, Any]:
+        return json.loads(Path("tests/samples/naruto.json").read_bytes())
