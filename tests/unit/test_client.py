@@ -2,12 +2,12 @@ import asyncio
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
-import pytest
 import httpx
+import pytest
 from pytest_mock import MockerFixture
+from lxml import etree
 from conftest import MockResponse
 from core.client import Client
-from lxml import etree
 from core.models.manga import Chapter, Manga
 from core.utils.exceptions import MangaNotFound, ParsingError
 
