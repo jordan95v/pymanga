@@ -3,8 +3,8 @@ from typing import Any
 from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
-from conftest import MockResponse
 from requests_html import AsyncHTMLSession
+from conftest import MockResponse
 from core.models.manga import Manga, Chapter
 from core.utils.exceptions import ChapterNotFound
 
