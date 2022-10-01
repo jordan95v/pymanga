@@ -2,7 +2,7 @@ __pycache__/
 .pytest_cache/
 venv/
 keep.py
-main.py
 .coverage
 dl_all.py
 dl_chapter.py
+pull.sh
