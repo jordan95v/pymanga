@@ -6,7 +6,7 @@ from core.models.manga import Chapter, Manga
 from core.utils.exceptions import MangaNotFound
 
 
-async def dl_chapter(
+async def _dl_chapter(
     chapter: Chapter, path: Path, client: Client, sem: asyncio.Semaphore
 ) -> None:
     async with sem:
@@ -38,7 +38,7 @@ async def scrap(name: str, path: Path, limit: int) -> None:
             sem: asyncio.Semaphore = asyncio.Semaphore(limit)
             await asyncio.gather(
                 *[
-                    dl_chapter(chapter, manga_dir, client, sem)
+                    _dl_chapter(chapter, manga_dir, client, sem)
                     for chapter in manga.chapters  # type: ignore
                     if (manga_dir / f"{chapter.title}.cbz") not in manga_dir.iterdir()
                 ]
@@ -57,7 +57,7 @@ async def scrap(name: str, path: Path, limit: int) -> None:
     default=(Path.home() / "Desktop"),
 )
 @click.option("--chp_num", prompt="Enter the chapter's number", type=str)
-def download_chapter(name: str, path: Path, chp_num: str):
+def dl_chapter(name: str, path: Path, chp_num: str):
     asyncio.run(scrap_chapter(name, chp_num, path))
 
 
@@ -75,7 +75,7 @@ def download_chapter(name: str, path: Path, chp_num: str):
 @click.option(
     "--limit", prompt="Limit of chapter downloaded concurently", type=int, default=5
 )
-def download_all(name: str, path: Path, limit: int):
+def dl_all(name: str, path: Path, limit: int):
     asyncio.run(scrap(name, path, limit))
 
 
@@ -85,6 +85,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main.add_command(download_chapter)
-    main.add_command(download_all)
+    main.add_command(dl_all)
+    main.add_command(dl_chapter)
     main()
