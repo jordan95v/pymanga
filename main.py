@@ -18,7 +18,7 @@ async def scrap_chapter(name: str, chp_num: str, path: Path) -> None:
         try:
             manga: Manga = await client.get_manga_info(name)  # type: ignore
         except MangaNotFound:
-            print(f'"{name} not found.')
+            print(f"{name} not found.")
         else:
             for chapter in manga.chapters:  # type: ignore
                 if chp_num in chapter.title:  # type: ignore
