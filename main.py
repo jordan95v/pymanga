@@ -33,7 +33,7 @@ async def scrap(name: str, path: Path, limit: int) -> None:
         try:
             manga: Manga = await client.get_manga_info(name)  # type: ignore
         except MangaNotFound:
-            print(f'"{name} not found.')
+            print(f"{name} not found.")
         else:
             manga_dir: Path = path / name
             manga_dir.mkdir(exist_ok=True)
@@ -41,7 +41,7 @@ async def scrap(name: str, path: Path, limit: int) -> None:
             await asyncio.gather(
                 *[
                     _dl_chapter(chapter, manga_dir, client, sem)
-                    for chapter in manga.chapterss  # type: ignore
+                    for chapter in manga.chapters  # type: ignore
                     if (manga_dir / f"{chapter.title}.cbz") not in manga_dir.iterdir()
                 ]
             )
