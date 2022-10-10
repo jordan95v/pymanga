@@ -6,6 +6,7 @@ It also allows you to download the scan 😎
 - [MANGA SCRAPER](#manga-scraper)
   - [Installation](#installation)
   - [Coverage](#coverage)
+  - [Command](#command)
   - [Workflow](#workflow)
     - [Get manga info](#get-manga-info)
     - [Download chapter images](#download-chapter-images)
@@ -15,7 +16,7 @@ It also allows you to download the scan 😎
 
 If you feel like the project needs something more, feel free to pull and dev ! Here's how to (but i guess you already know how to do) !
 
-```shell
+```bash
 C:/Users/you> git clone https://www.github.com/jordan95v/manga_scraper
 C:/Users/you> cd manga_scraper
 C:/Users/you/manga_scraper> py -m venv venv
@@ -30,6 +31,16 @@ And you're set to go !
 Here is the `pytest` code coverage:
 
 ![test_coverage](tests/test_coverage.png)
+
+## Command
+
+I also built some custom commands so you can use the package easily !
+
+Just run `python main.py <command>` :
+- `dl-all` to download all the chapters of a manga.
+- `dl-chapter` to dl a specific chapter of a manga.
+
+Either way prompt are gonna shows up, or you can just give arguments, just run `python main.py <command> --help` to have further information.
 
 ## Workflow
 
