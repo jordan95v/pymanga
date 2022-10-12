@@ -64,7 +64,7 @@ async def scrap() -> None:
         try:
             manga: Manga = await client.get_manga_info(name)  # type: ignore
         except MangaNotFound:
-            print(f'"{name} not found.')
+            print(f"{name} not found.")
         else:
             manga_dir: Path = path / name
             manga_dir.mkdir(exist_ok=True)
