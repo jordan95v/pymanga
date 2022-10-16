@@ -5,10 +5,10 @@ from datetime import datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Type
-from typing_extensions import Self
 from zipfile import ZipFile
 import httpx
 from lxml import etree
+from typing_extensions import Self
 from core.models.manga import Chapter, Manga
 from core.utils.exceptions import MangaNotFound, ParsingError
 
@@ -20,7 +20,7 @@ class Client:
     base_url: str = "https://mangasee123.com/rss/"
     session: httpx.AsyncClient = httpx.AsyncClient()
 
-    async def _parse_xml(self, xml: etree._Element) -> Manga:
+    async def _parse_xml(self, xml: etree._Element) -> dict[str, Any]:
         """Parse the XML from MangaSee and retrieve info.
 
         Args:
@@ -60,7 +60,7 @@ class Client:
             )
             res.raise_for_status()
         except httpx.HTTPError:
-            raise MangaNotFound()
+            return dict()
         else:
             data: dict[str, Any] = res.json()["data"][0]["attributes"]
             return dict(

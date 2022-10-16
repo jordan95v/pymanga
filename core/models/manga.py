@@ -1,8 +1,8 @@
 from datetime import date, datetime
-from pydantic import BaseModel
-from requests_html import AsyncHTMLSession, Element, HTMLResponse
-from requests import HTTPError
 from core.utils.exceptions import ChapterNotFound
+from pydantic import BaseModel
+from requests import HTTPError
+from requests_html import AsyncHTMLSession, Element, HTMLResponse
 
 __all__: list[str] = ["Chapter", "Manga"]
 

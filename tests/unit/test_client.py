@@ -1,15 +1,16 @@
 import asyncio
+import datetime
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 import httpx
 import pytest
-from pytest_mock import MockerFixture
-from lxml import etree
 from conftest import MockResponse
 from core.client import Client
 from core.models.manga import Chapter, Manga
 from core.utils.exceptions import MangaNotFound, ParsingError
+from lxml import etree
+from pytest_mock import MockerFixture
 
 
 @pytest.fixture
@@ -40,62 +41,46 @@ class TestClient:
         await client.close()
         assert close_spy.call_count == 1
 
-    @pytest.mark.parametrize(
-        "status_code, throwable",
-        [
-            (200, None),
-            (404, MangaNotFound),
-        ],
-    )
     @pytest.mark.asyncio
-    async def test_get_manga_info(
-        self,
-        client: Client,
-        status_code: int,
-        throwable: Exception | None,
-        mocker: MockerFixture,
-    ) -> None:
+    async def test_get_manga_info(self, client: Client, mocker: MockerFixture) -> None:
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
         mocker.patch.object(
-            httpx.AsyncClient, "get", return_value=MockResponse(status_code)
+            Client,
+            "_parse_xml",
+            return_value=dict(
+                link="hello.html", title="Naruto", image="hello.jpg", chapters=[]
+            ),
         )
-        if throwable:
-            with pytest.raises(throwable):
-                await client.get_manga_info("Naruto")
-        else:
-            ret: Manga = await client.get_manga_info("Naruto")
-            assert ret.title == "Naruto"
+        ret: Manga = await client.get_manga_info("Naruto")
+        assert ret.title == "Naruto"
+        assert ret.start_date == datetime.date(1999, 9, 21)
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        "status_code, throwable",
-        [
-            (200, None),
-            (404, MangaNotFound),
-        ],
-    )
-    async def test_get_info(
-        self,
-        client: Client,
-        status_code: int,
-        throwable: Exception | None,
-        mocker: MockerFixture,
+    async def test_get_manga_info_404(
+        self, client: Client, mocker: MockerFixture
     ) -> None:
-        mocker.patch.object(
-            httpx.AsyncClient, "get", return_value=MockResponse(status_code)
-        )
-        if throwable:
-            with pytest.raises(MangaNotFound):
-                await client._get_info("Naruto")
-        else:
-            res: dict[str, Any] = await client._get_info("Naruto")
-            assert res["start_date"] == "1999-09-21"
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(404))
+        with pytest.raises(MangaNotFound):
+            await client.get_manga_info("Naruto")
+
+    @pytest.mark.asyncio
+    async def test_get_info(self, client: Client, mocker: MockerFixture) -> None:
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(200))
+        res: dict[str, Any] = await client._get_info("Naruto")
+        assert res["start_date"] == "1999-09-21"
+
+    @pytest.mark.asyncio
+    async def test_get_info_404(self, client: Client, mocker: MockerFixture) -> None:
+        mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(404))
+        res: dict[str, Any] = await client._get_info("Naruto")
+        assert res == dict()
 
     @pytest.mark.asyncio
     async def test_parse_xml(self, client: Client) -> None:
         xml: etree._Element = etree.fromstring(
             Path("tests/samples/naruto.xml").read_text()
         )
-        ret: Manga = await client._parse_xml(xml=xml)
+        ret: dict[str, Any] = await client._parse_xml(xml=xml)
         assert ret["title"] == "Naruto"
         assert ret["link"] == "https://mangasee123.com/manga/Naruto"
         assert ret["chapters"][0].title == "Naruto Chapter 1"
