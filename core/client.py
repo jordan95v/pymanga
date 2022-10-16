@@ -60,7 +60,7 @@ class Client:
             )
             res.raise_for_status()
         except httpx.HTTPError:
-            raise MangaNotFound()
+            return dict()
         else:
             data: dict[str, Any] = res.json()["data"][0]["attributes"]
             return dict(
