@@ -72,8 +72,8 @@ class TestClient:
     @pytest.mark.asyncio
     async def test_get_info_404(self, client: Client, mocker: MockerFixture) -> None:
         mocker.patch.object(httpx.AsyncClient, "get", return_value=MockResponse(404))
-        res: dict[str, Any] = await client._get_info("Naruto")
-        assert res == dict()
+        with pytest.raises(MangaNotFound):
+            await client._get_info("Naruto")
 
     @pytest.mark.asyncio
     async def test_parse_xml(self, client: Client) -> None:

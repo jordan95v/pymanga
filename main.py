@@ -23,7 +23,9 @@ async def ask_user(mode: Mode) -> Any:
     )
     if mode == Mode.DL_ALL:
         limit: str = typer.prompt(
-            "Enter le limit of chapter downloaded at the same time", type=int, default=5
+            "Enter the limit of chapter downloaded at the same time",
+            type=int,
+            default=5,
         )
         return name, path, limit
     else:

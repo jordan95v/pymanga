@@ -60,7 +60,7 @@ class Client:
             )
             res.raise_for_status()
         except httpx.HTTPError:
-            return dict()
+            raise MangaNotFound()
         else:
             data: dict[str, Any] = res.json()["data"][0]["attributes"]
             return dict(
@@ -78,7 +78,7 @@ class Client:
         Return:
             Manga: The dataclass with extracted info.
         """
-        name: str = re.sub(r"[^\w]", " ", manga_name).replace("_", " ").title()
+        name: str = re.sub(r"[^\w]", " ", manga_name).replace("_", " ")
         try:
             res: httpx.Response = await self.session.get(
                 f"{self.base_url}{'-'.join(name.split())}.xml"
