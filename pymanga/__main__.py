@@ -1,10 +1,10 @@
 import asyncio
 from pathlib import Path
 import typer
+from rich import print
 from typing_extensions import Annotated
 from pymanga.client import Client
 from pymanga.models import Chapter
-from rich import print
 
 app: typer.Typer = typer.Typer()
 
