@@ -53,6 +53,16 @@ async def main() -> None:
     await client.close()
 ```
 
+# Commands
+
+`pymanga` comes with a command line interface, so you can use it like this:
+
+```bash
+(venv) $ python -m pymanga --help
+```
+
+That will show you all the available commands and options.
+
 # Contributing
 
 Contributions to `pymanga` are welcome! If you encounter any issues or have suggestions for improvements, please open an issue on the project's GitHub repository.<br>

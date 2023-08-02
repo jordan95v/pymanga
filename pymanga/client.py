@@ -1,14 +1,13 @@
 import asyncio
 from dataclasses import dataclass
-import logging
+from pathlib import Path
 from types import TracebackType
 from typing import ClassVar, Type
 from urllib.parse import urljoin
-from pathlib import Path
 from zipfile import ZipFile
 from lxml import etree
 from requests import HTTPError, Response
-from requests_html import AsyncHTMLSession, requests
+from requests_html import AsyncHTMLSession
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
 
@@ -62,7 +61,6 @@ class Client:
             for url, ret in zip(images_urls, res):
                 image_name: str = url.split("/")[-1]
                 zip_file.writestr(image_name, ret.content)
-        print(f"Downloaded {chapter.name} to <{output / chapter.name}>.")
 
     async def get_chapters(self, name: str) -> list[Chapter]:
         """Get chapters of a manga.

@@ -15,7 +15,8 @@ classifiers = [
 ]
 dependencies = [
     "requests-html",
-    "lxml"
+    "lxml",
+    "typer[all]"
 ]
 
 [project.optional-dependencies]
