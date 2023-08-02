@@ -14,8 +14,10 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    "request-html",
-    "httpx"
+    "requests-html",
+    "httpx",
+    "pydantic",
+    "lxml"
 ]
 
 [project.optional-dependencies]
