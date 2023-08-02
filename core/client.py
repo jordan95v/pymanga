@@ -1,7 +1,11 @@
+import asyncio
 from dataclasses import dataclass
+import logging
 from types import TracebackType
 from typing import ClassVar, Type
 from urllib.parse import urljoin
+from pathlib import Path
+from zipfile import ZipFile
 from lxml import etree
 from requests import HTTPError, Response
 from requests_html import AsyncHTMLSession
@@ -16,7 +20,7 @@ class Client:
     base_url: ClassVar[str] = "https://mangasee123.com/"
     session: AsyncHTMLSession | None = None
 
-    async def _call(self, url: str) -> Response:
+    async def _call(self, url: str, sema: asyncio.Semaphore | None = None) -> Response:
         """Make a request to a url.
 
         Args:
@@ -26,11 +30,39 @@ class Client:
             Response: A response object.
         """
 
+        await sema.acquire() if sema else None
         session: AsyncHTMLSession = self.session or AsyncHTMLSession()
         res: Response = await session.get(url)
         if not self.session:
             await session.close()
+        sema.release() if sema else None
         return res
+
+    async def download_chapter(
+        self, chapter: Chapter, output: Path, limit: int
+    ) -> None:
+        """Download a chapter.
+
+        Args:
+            chapter (Chapter): The chapter to download.
+            output (Path): The output path.
+            limit (int): The limit of concurrent image to downloads.
+        """
+
+        sema: asyncio.Semaphore = asyncio.Semaphore(limit)
+        session: AsyncHTMLSession = self.session or AsyncHTMLSession()
+        images_urls: list[str] = await chapter.get_images(session)
+        res: list[Response] = await asyncio.gather(
+            *[self._call(url, sema) for url in images_urls]
+        )
+        output.mkdir(parents=True, exist_ok=True)
+        with ZipFile(output / f"{chapter.name}.cbz", "w") as zip_file:
+            for url, ret in zip(images_urls, res):
+                image_name: str = url.split("/")[-1]
+                zip_file.writestr(image_name, ret.content)
+        if not self.session:
+            await session.close()
+        print(f"Downloaded {chapter.name} to <{output / chapter.name}>.")
 
     async def get_chapters(self, name: str) -> list[Chapter]:
         """Get chapters of a manga.
@@ -45,7 +77,9 @@ class Client:
             AsyncGenerator[Chapter, None]: An async generator of chapters.
         """
 
-        res: Response = await self._call(urljoin(self.base_url, name))
+        res: Response = await self._call(
+            urljoin(self.base_url, f"rss/{name.title().replace(' ', '-')}.xml")
+        )
         try:
             res.raise_for_status()
         except HTTPError:

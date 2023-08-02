@@ -75,3 +75,19 @@ class TestClient:
         client: Client = Client(session=AsyncHTMLSession())
         await client.close()
         close_spy.assert_called_once()
+
+    async def test_download_chapter(
+        self,
+        client: Client,
+        chapter: Chapter,
+        mocker: MockerFixture,
+        tmp_path: pathlib.Path,
+    ) -> None:
+        mocker.patch.object(
+            Chapter, "get_images", return_value=["fake_url", "fake_url_2"]
+        )
+        mocker.patch.object(
+            Client, "_call", return_value=MockResponse("fake_text", 200)
+        )
+        await client.download_chapter(chapter, tmp_path, 2)
+        assert (tmp_path / "fake_chapter.cbz").exists()

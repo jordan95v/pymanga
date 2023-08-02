@@ -26,6 +26,10 @@ class MockResponse:
         if self.status_code != 200:
             raise HTTPError("fake_error")
 
+    @property
+    def content(self) -> bytes:
+        return bytes(self.text, "utf-8")
+
 
 class MockElement:
     @property
