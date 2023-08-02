@@ -18,9 +18,7 @@ class TestClient:
 
         client: Client = Client()
         mocker.patch.object(AsyncHTMLSession, "get", patch_html)
-        close_spy: MagicMock = mocker.spy(AsyncHTMLSession, "close")
-        await client._call("fake_url")
-        close_spy.assert_called_once()
+        await client._call("fake_url", AsyncHTMLSession())
 
     @pytest.mark.parametrize(
         "given, status_code, throwable, expected_length",
