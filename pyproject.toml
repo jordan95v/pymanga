@@ -1,0 +1,38 @@
+[project]
+name  ="pymanga"
+description = "A manga downloader from mangasee123"
+version = "0.1.0"
+readme = "README.md"
+keywords = ["manga", "zip", "cbz"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Operating System :: OS Independent",
+    "Topic :: Communications :: Chat",
+    "Topic :: Internet",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "request-html",
+    "httpx"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "mypy",
+    "flake8",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-mock",
+    "freezegun",
+]
+
+[tool.pytest.ini_options]
+addopts = ["-vv", "--tb=short", "--cov", "--cov-report=term-missing"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
