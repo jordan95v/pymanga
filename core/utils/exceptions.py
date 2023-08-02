@@ -1,6 +1,6 @@
 class MangaNotFound(Exception):
-    """Raised when a manga is not found.
+    """Raised when a manga is not found."""
 
-    Args:
-        Exception (_type_): Base class for all exceptions.
-    """
+
+class ChapterNotFound(Exception):
+    """Raised when a chapter is not found."""
