@@ -9,8 +9,8 @@ from zipfile import ZipFile
 from lxml import etree
 from requests import HTTPError, Response
 from requests_html import AsyncHTMLSession, requests
-from core.models import Chapter
-from core.utils.exceptions import MangaNotFound
+from pymanga.models import Chapter
+from pymanga.utils.exceptions import MangaNotFound
 
 __all__: list[str] = ["Client"]
 

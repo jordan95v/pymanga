@@ -28,7 +28,6 @@ dev = [
     "pytest-cov",
     "pytest-mock",
     "freezegun",
-    "types-requests"
 ]
 
 [tool.pytest.ini_options]

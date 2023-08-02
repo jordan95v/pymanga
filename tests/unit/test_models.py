@@ -3,8 +3,8 @@ import pytest
 from pytest_mock import MockerFixture
 from requests_html import AsyncHTMLSession
 from conftest import MockHTMLResponse
-from core.models import Chapter
-from core.utils.exceptions import ChapterNotFound
+from pymanga.models import Chapter
+from pymanga.utils.exceptions import ChapterNotFound
 
 
 @pytest.mark.asyncio

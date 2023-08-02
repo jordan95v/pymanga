@@ -1,10 +1,10 @@
 from typing import Any
 import pytest
 from dataclasses import dataclass
-from core import Client
+from pymanga import Client
 from requests import HTTPError
 
-from core.models.manga import Chapter
+from pymanga.models.manga import Chapter
 
 
 @pytest.fixture

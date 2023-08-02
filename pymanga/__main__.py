@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
-from core.client import Client
-from core.models.manga import Chapter
+from pymanga.client import Client
+from pymanga.models import Chapter
 
 
 async def main() -> None:

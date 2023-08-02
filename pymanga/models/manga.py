@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from requests import HTTPError
 from requests_html import AsyncHTMLSession, HTMLResponse
-from core.utils.exceptions import ChapterNotFound
+from pymanga.utils.exceptions import ChapterNotFound
 
 __all__: list[str] = ["Chapter"]
 

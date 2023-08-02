@@ -5,9 +5,9 @@ import pytest
 from pytest_mock import MockerFixture
 from requests_html import AsyncHTMLSession
 from conftest import MockResponse
-from core import Client
-from core.models import Chapter
-from core.utils.exceptions import MangaNotFound
+from pymanga import Client
+from pymanga.models import Chapter
+from pymanga.utils.exceptions import MangaNotFound
 
 
 @pytest.mark.asyncio
