@@ -33,6 +33,8 @@ def main(
             chapters: list[Chapter] = await client.get_chapters(manga_name)
             if from_ is not None and to is not None:
                 chapters = chapters[from_ - 1 : to]
+            elif from_ is not None:
+                chapters = chapters[from_ - 1 :]
             print(f"Downloading [green]{len(chapters)}[/green] chapters...\n")
 
             for chapter in chapters:

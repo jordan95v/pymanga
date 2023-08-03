@@ -39,16 +39,17 @@ async def main() -> None:
     client = Client()
     # Do stuff with the client
 ```
-This is going to impact performance a little bit, because it's going to create an `AsyncHTMLSession` for every request.
+This is going to impact performance a little bit, because it's going to create an `httpx.AsyncClient` for every request.
 
-You can also pass a custom `AsyncHTMLSession` to the client, like this:
+You can also pass a custom `httpx.AsyncClient` to the client, like this:
 Be sure to call the `close` method of the client at the end of the program, or you will have a memory leak.
 
 ```python
+import httpx
 from pymanga import Client
 
 async def main() -> None:
-    client = Client(session=AsyncHTMLSession())
+    client = Client(session=httpx.AsyncClient())
     # Do stuff with the client
     await client.close()
 ```

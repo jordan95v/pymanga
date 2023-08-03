@@ -1,8 +1,9 @@
-from typing import Any, Type
+from pathlib import Path
+from typing import Type
+import httpx
 import pytest
 from pytest_mock import MockerFixture
-from requests_html import AsyncHTMLSession
-from conftest import MockHTMLResponse
+from conftest import MockResponse
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import ChapterNotFound
 
@@ -23,17 +24,46 @@ class TestChapter:
         status_code: int,
         throwable: Type[Exception],
     ) -> None:
-        async def patch_html(*args: Any, **kwargs: Any) -> MockHTMLResponse:
-            return MockHTMLResponse(status_code)
-
-        mocker.patch.object(AsyncHTMLSession, "get", patch_html)
-        session: AsyncHTMLSession = AsyncHTMLSession()
+        mocker.patch.object(
+            httpx.AsyncClient,
+            "get",
+            return_value=MockResponse(
+                Path("tests/samples/fake.html").read_text(), status_code
+            ),
+        )
+        session: httpx.AsyncClient = httpx.AsyncClient()
 
         if throwable:
             with pytest.raises(throwable):
                 await chapter.get_images(session)
-            await session.close()
         else:
             imgs: list[str] = await chapter.get_images(session)
-            await session.close()
-            assert imgs == ["https://fake_url.com" for _ in range(2)]
+            assert imgs == [
+                "https://fake_url/manga/Fake/0001-001.png",
+                "https://fake_url/manga/Fake/0001-002.png",
+            ]
+        await session.aclose()
+
+    @pytest.mark.parametrize(
+        "given, expected",
+        [
+            ("Bleach Bankai Stories Chapter 1", "Bleach-Bankai-Stories"),
+            ("Bleach Chapter 1", "Bleach"),
+            ("Bleach Chapter 1.5", "Bleach"),
+        ],
+    )
+    async def test_slug(self, given: str, expected: str) -> None:
+        chapter: Chapter = Chapter(given, "https://fake_url.com")
+        assert chapter.slug == expected
+
+    @pytest.mark.parametrize(
+        "given, expected",
+        [
+            ("Bleach Bankai Stories Chapter 1", 1),
+            ("Bleach Chapter 1", 1),
+            ("Bleach Chapter 1.5", 1.5),
+        ],
+    )
+    async def test_number(self, given: str, expected: int | float) -> None:
+        chapter: Chapter = Chapter(given, "https://fake_url.com")
+        assert chapter.number == expected

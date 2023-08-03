@@ -5,9 +5,8 @@ from types import TracebackType
 from typing import ClassVar, Type
 from urllib.parse import urljoin
 from zipfile import ZipFile
+import httpx
 from lxml import etree
-from requests import HTTPError, Response
-from requests_html import AsyncHTMLSession
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
 
@@ -17,11 +16,14 @@ __all__: list[str] = ["Client"]
 @dataclass
 class Client:
     base_url: ClassVar[str] = "https://mangasee123.com/"
-    session: AsyncHTMLSession | None = None
+    session: httpx.AsyncClient | None = None
 
     async def _call(
-        self, url: str, session: AsyncHTMLSession, sema: asyncio.Semaphore | None = None
-    ) -> Response:
+        self,
+        url: str,
+        session: httpx.AsyncClient,
+        sema: asyncio.Semaphore | None = None,
+    ) -> httpx.Response:
         """Make a request to a url.
 
         Args:
@@ -32,7 +34,7 @@ class Client:
         """
 
         await sema.acquire() if sema else None
-        res: Response = await session.get(url)
+        res: httpx.AsyncClient = await session.get(url)
         sema.release() if sema else None
         return res
 
@@ -48,13 +50,13 @@ class Client:
         """
 
         sema: asyncio.Semaphore = asyncio.Semaphore(limit)
-        session: AsyncHTMLSession = self.session or AsyncHTMLSession()
+        session: httpx.AsyncClient = self.session or httpx.AsyncClient()
         images_urls: list[str] = await chapter.get_images(session)
-        res: list[Response] = await asyncio.gather(
+        res: list[httpx.Response] = await asyncio.gather(
             *[self._call(url, session, sema) for url in images_urls]
         )
         if not self.session:
-            await session.close()
+            await session.aclose()
 
         output.mkdir(parents=True, exist_ok=True)
         with ZipFile(output / f"{chapter.name}.cbz", "w") as zip_file:
@@ -75,16 +77,16 @@ class Client:
             AsyncGenerator[Chapter, None]: An async generator of chapters.
         """
 
-        session: AsyncHTMLSession = self.session or AsyncHTMLSession()
-        res: Response = await self._call(
+        session: httpx.AsyncClient = self.session or httpx.AsyncClient()
+        res: httpx.Response = await self._call(
             urljoin(self.base_url, f"rss/{name.title().replace(' ', '-')}.xml"), session
         )
         try:
             res.raise_for_status()
-        except HTTPError:
+        except httpx.HTTPError:
             raise MangaNotFound(name)
         if not self.session:
-            await session.close()
+            await session.aclose()
 
         xml: etree._Element = etree.fromstring(res.text)
         return [
@@ -95,6 +97,10 @@ class Client:
             for item in xml.findall(".//item")[::-1]
         ]
 
+    async def close(self) -> None:
+        if self.session:
+            await self.session.aclose()
+
     async def __aenter__(self) -> "Client":
         """Enter the client.
 
@@ -102,12 +108,8 @@ class Client:
             Client: The client object.
         """
 
-        self.session = AsyncHTMLSession()
+        self.session = httpx.AsyncClient()
         return self
-
-    async def close(self) -> None:
-        if self.session:
-            await self.session.close()
 
     async def __aexit__(
         self,

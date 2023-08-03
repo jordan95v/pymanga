@@ -14,7 +14,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    "requests-html",
+    "httpx",
     "lxml",
     "typer[all]"
 ]
