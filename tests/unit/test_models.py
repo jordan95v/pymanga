@@ -5,7 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 from conftest import MockResponse
 from pymanga.models import Chapter
-from pymanga.utils.exceptions import ChapterNotFound
+from pymanga.utils.exceptions import ChapterError, ChapterNotFound
 
 
 @pytest.mark.asyncio
@@ -37,6 +37,14 @@ class TestChapter:
             with pytest.raises(throwable):
                 await chapter.get_images(session)
         else:
+            mocker.patch.object(
+                chapter, "_parse_html", return_value=(2, "", "fake_url")
+            )
+            mocker.patch.object(
+                chapter,
+                "_get_number_path",
+                side_effect=["0001-001.png", "0001-002.png"],
+            )
             imgs: list[str] = await chapter.get_images(session)
             assert imgs == [
                 "https://fake_url/manga/fake/0001-001.png",
@@ -57,13 +65,35 @@ class TestChapter:
         assert chapter.slug == expected
 
     @pytest.mark.parametrize(
-        "given, expected",
+        "given, expected, throwable",
         [
-            ("Bleach-Bankai-Stories-Chapter-1", 1),
-            ("Bleach-Chapter-1", 1),
-            ("Bleach-Chapter-1.5", 1.5),
+            (Path("tests/samples/fake.html"), (2, "test", "fake_url"), None),
+            (Path("tests/samples/fake_bad.html"), None, ChapterError),
+            (Path("tests/samples/fake_nothing.html"), None, ChapterError),
         ],
     )
-    async def test_number(self, given: str, expected: int | float) -> None:
-        chapter: Chapter = Chapter(given, "https://fake_url.com")
-        assert chapter.number == expected
+    async def test__parse_html(
+        self,
+        chapter: Chapter,
+        given: Path,
+        expected: tuple[int, str, str] | None,
+        throwable: Type[Exception] | None,
+    ) -> None:
+        res: httpx.Response = MockResponse(given.read_text("utf-8"), 200)
+        if throwable:
+            with pytest.raises(throwable):
+                await chapter._parse_html(res)
+        else:
+            assert await chapter._parse_html(res) == expected
+
+    @pytest.mark.parametrize(
+        "given, image_number, expected",
+        [
+            (Chapter(name="Bleach-4", url="fake_url"), 77, "0004-077.png"),
+            (Chapter(name="Bleach-4.5", url="fake_url"), 189, "0004.5-189.png"),
+        ],
+    )
+    async def test__get_number_path(
+        self, given: Chapter, image_number: int, expected: str
+    ) -> None:
+        assert given._get_number_path(image_number) == expected

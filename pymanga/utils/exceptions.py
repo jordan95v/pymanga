@@ -4,3 +4,7 @@ class MangaNotFound(Exception):
 
 class ChapterNotFound(Exception):
     """Raised when a chapter is not found."""
+
+
+class ChapterError(Exception):
+    """Raised when an error happens when gathering images for chapter."""
