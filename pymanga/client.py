@@ -106,6 +106,8 @@ class Client:
         ]
 
     async def close(self) -> None:
+        """Close the client."""
+
         if self.session:
             await self.session.aclose()
 

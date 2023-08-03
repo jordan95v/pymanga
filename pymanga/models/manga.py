@@ -2,9 +2,8 @@ import json
 import posixpath
 import re
 from dataclasses import dataclass
-from urllib.parse import urljoin
 import httpx
-from pymanga.utils.exceptions import ChapterNotFound, ChapterError
+from pymanga.utils.exceptions import ChapterError, ChapterNotFound
 from pymanga.utils.regex import CHAPTER_PATH_REGEX, CURRENT_CHAPTER_REGEX
 
 __all__: list[str] = ["Chapter"]
@@ -60,7 +59,6 @@ class Chapter:
         """
 
         chapter_number: str = self.name.split("-")[-1]
-
         return (
             f"{float(chapter_number):06.1f}-{number:03}.png"
             if not chapter_number.isnumeric()
