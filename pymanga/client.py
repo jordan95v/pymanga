@@ -1,4 +1,5 @@
 import asyncio
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from types import TracebackType
@@ -6,8 +7,9 @@ from typing import ClassVar, Type
 from urllib.parse import urljoin
 from zipfile import ZipFile
 import httpx
-import re
+import typer
 from lxml import etree
+from rich.progress_bar import ProgressBar
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
 
@@ -24,6 +26,7 @@ class Client:
         url: str,
         session: httpx.AsyncClient,
         sema: asyncio.Semaphore | None = None,
+        progress: ProgressBar | None = None,
     ) -> httpx.Response:
         """Make a request to a url.
 
@@ -36,6 +39,7 @@ class Client:
 
         await sema.acquire() if sema else None
         res: httpx.Response = await session.get(url)
+        progress.update(1) if progress else None
         sema.release() if sema else None
         return res
 
@@ -53,9 +57,11 @@ class Client:
         sema: asyncio.Semaphore = asyncio.Semaphore(limit)
         session: httpx.AsyncClient = self.session or httpx.AsyncClient()
         images_urls: list[str] = await chapter.get_images(session)
-        res: list[httpx.Response] = await asyncio.gather(
-            *[self._call(url, session, sema) for url in images_urls]
-        )
+
+        with typer.progressbar(length=len(images_urls)) as progress:
+            res: list[httpx.Response] = await asyncio.gather(
+                *[self._call(url, session, sema, progress) for url in images_urls]
+            )
         if not self.session:
             await session.aclose()
 

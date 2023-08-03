@@ -7,6 +7,24 @@ If you enjoy the content, be sure to check out the original website and obviousl
 
 <img src="https://media.tenor.com/Dx7Ek15cLFEAAAAC/bleach-anime.gif" width="100%">
 
+# Code structure
+
+`pymanga` is a simple project, so the code structure is pretty simple too.
+
+```bash
+├── pymanga
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── manga.py # Contains the Chapter class.
+│   ├── utils
+│   │   ├── __init__.py
+│   │   ├── exceptions.py # Contains all the exceptions used by client.
+│   │   ├── regex.py # Contains regex to scrap the website.
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── client.py
+```
+
 # Installation
 
 ```bash

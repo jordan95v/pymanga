@@ -1,10 +1,9 @@
-from dataclasses import dataclass
 import json
-from pathlib import Path
 import re
+from dataclasses import dataclass
 import httpx
 from pymanga.utils.exceptions import ChapterNotFound
-from pymanga.utils.regex import CURRENT_CHAPTER_REGEX, CHAPTER_PATH_REGEX
+from pymanga.utils.regex import CHAPTER_PATH_REGEX, CURRENT_CHAPTER_REGEX
 
 __all__: list[str] = ["Chapter"]
 
@@ -38,7 +37,6 @@ class Chapter:
             )
             path: str = f"{directory + '/' if directory else ''}{number_path}.png"
             urls.append(f"https://{base_image_url}/manga/{self.slug}/{path}")
-        print(urls)
         return urls
 
     @property

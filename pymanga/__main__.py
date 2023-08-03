@@ -35,14 +35,14 @@ def main(
                 chapters = chapters[from_ - 1 : to]
             elif from_ is not None:
                 chapters = chapters[from_ - 1 :]
-            print(f"Downloading [green]{len(chapters)}[/green] chapters...\n")
+            print(f"Downloading [green]{len(chapters)}[/green] chapters ...\n")
 
             for chapter in chapters:
-                print(f"Downloading chapter [green]{chapter.name}[/green]...")
+                print(f"[bold]Downloading[/bold] [blue]{chapter.name}[/blue]")
                 await client.download_chapter(chapter, output, 3)
                 print(
-                    f"Downloaded chapter [green]{chapter.name}[/green] "
-                    f"to [yellow]{output}[/yellow] !"
+                    f"[bold green]Downloaded[/bold green]"
+                    f" [blue]{chapter.name}[/blue] to [yellow]{output}[/yellow] !\n"
                 )
 
     asyncio.run(handle(manga_name, output, from_, to))
