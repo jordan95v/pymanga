@@ -12,7 +12,7 @@ def client() -> Client:
 
 @pytest.fixture
 def chapter() -> Chapter:
-    return Chapter(name="fake chapter 1", url="https://fake_url.com")
+    return Chapter(name="fake-chapter-1", url="https://fake_url.com")
 
 
 @dataclass

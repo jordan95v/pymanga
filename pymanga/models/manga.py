@@ -38,20 +38,21 @@ class Chapter:
             )
             path: str = f"{directory + '/' if directory else ''}{number_path}.png"
             urls.append(f"https://{base_image_url}/manga/{self.slug}/{path}")
+        print(urls)
         return urls
 
     @property
     def slug(self) -> str:
         slug: list[str] = []
-        for word in self.name.split():
+        for word in self.name.split("-"):
             if "chapter" in word.lower():
                 break
-            slug.append(word.title())
+            slug.append(word)
         return "-".join(slug)
 
     @property
     def number(self) -> float | int:
-        number: str = self.name.split()[-1]
+        number: str = self.name.split("-")[-1]
         if number.isnumeric():
             return int(number)
         return float(number)

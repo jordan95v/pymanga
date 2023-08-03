@@ -6,6 +6,7 @@ from typing import ClassVar, Type
 from urllib.parse import urljoin
 from zipfile import ZipFile
 import httpx
+import re
 from lxml import etree
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
@@ -34,7 +35,7 @@ class Client:
         """
 
         await sema.acquire() if sema else None
-        res: httpx.AsyncClient = await session.get(url)
+        res: httpx.Response = await session.get(url)
         sema.release() if sema else None
         return res
 
@@ -77,9 +78,10 @@ class Client:
             AsyncGenerator[Chapter, None]: An async generator of chapters.
         """
 
+        pattern: re.Pattern[str] = re.compile(r"[^a-zA-Z0-9-]")
         session: httpx.AsyncClient = self.session or httpx.AsyncClient()
         res: httpx.Response = await self._call(
-            urljoin(self.base_url, f"rss/{name.title().replace(' ', '-')}.xml"), session
+            urljoin(self.base_url, f"rss/{pattern.sub(' ', name)}.xml"), session
         )
         try:
             res.raise_for_status()
@@ -91,7 +93,7 @@ class Client:
         xml: etree._Element = etree.fromstring(res.text)
         return [
             Chapter(
-                item.find("title").text.strip(),
+                item.find("link").text.split("/")[-1].replace("-page-1.html", ""),
                 item.find("link").text.replace("-page-1", ""),
             )
             for item in xml.findall(".//item")[::-1]

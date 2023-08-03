@@ -86,4 +86,4 @@ class TestClient:
             Client, "_call", return_value=MockResponse("fake_text", 200)
         )
         await client.download_chapter(chapter, tmp_path, 2)
-        assert (tmp_path / "fake chapter 1.cbz").exists()
+        assert (tmp_path / "fake-chapter-1.cbz").exists()

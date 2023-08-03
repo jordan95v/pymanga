@@ -39,17 +39,17 @@ class TestChapter:
         else:
             imgs: list[str] = await chapter.get_images(session)
             assert imgs == [
-                "https://fake_url/manga/Fake/0001-001.png",
-                "https://fake_url/manga/Fake/0001-002.png",
+                "https://fake_url/manga/fake/0001-001.png",
+                "https://fake_url/manga/fake/0001-002.png",
             ]
         await session.aclose()
 
     @pytest.mark.parametrize(
         "given, expected",
         [
-            ("Bleach Bankai Stories Chapter 1", "Bleach-Bankai-Stories"),
-            ("Bleach Chapter 1", "Bleach"),
-            ("Bleach Chapter 1.5", "Bleach"),
+            ("Bleach-Bankai-Stories-Chapter-1", "Bleach-Bankai-Stories"),
+            ("Bleach-Chapter-1", "Bleach"),
+            ("Bleach-Chapter-1.5", "Bleach"),
         ],
     )
     async def test_slug(self, given: str, expected: str) -> None:
@@ -59,9 +59,9 @@ class TestChapter:
     @pytest.mark.parametrize(
         "given, expected",
         [
-            ("Bleach Bankai Stories Chapter 1", 1),
-            ("Bleach Chapter 1", 1),
-            ("Bleach Chapter 1.5", 1.5),
+            ("Bleach-Bankai-Stories-Chapter-1", 1),
+            ("Bleach-Chapter-1", 1),
+            ("Bleach-Chapter-1.5", 1.5),
         ],
     )
     async def test_number(self, given: str, expected: int | float) -> None:
