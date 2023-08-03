@@ -54,6 +54,9 @@ async def main() -> None:
     await client.close()
 ```
 
+If you do not find a manga, please go on [mangasee](https://mangasee123.com/) and check if the manga is there.<br>
+If it is, please go grab the manga's name in the RSS url and retry.
+
 # Commands
 
 `pymanga` comes with a command line interface, so you can use it like this:
