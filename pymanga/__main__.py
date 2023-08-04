@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path
+from typing import Union
 import typer
 from rich import print
 from typing_extensions import Annotated
@@ -14,13 +15,13 @@ def main(
     manga_name: Annotated[str, typer.Argument(help="Name of the manga.")],
     output: Annotated[Path, typer.Option(help="Output directory.")] = Path.cwd(),
     from_: Annotated[
-        int | None,
+        Union[int, None],
         typer.Argument(
             help="Download from this chapter.", rich_help_panel="Secondary arguments"
         ),
     ] = None,
     to: Annotated[
-        int | None,
+        Union[int, None],
         typer.Argument(
             help="End download to this chapter.", rich_help_panel="Secondary arguments"
         ),
