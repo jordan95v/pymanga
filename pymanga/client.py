@@ -19,7 +19,7 @@ __all__: list[str] = ["Client"]
 @dataclass
 class Client:
     base_url: ClassVar[str] = "https://mangasee123.com/"
-    session: httpx.AsyncClient | None = None
+    _session: httpx.AsyncClient = httpx.AsyncClient()
 
     async def _call(
         self,
@@ -55,15 +55,12 @@ class Client:
         """
 
         sema: asyncio.Semaphore = asyncio.Semaphore(limit)
-        session: httpx.AsyncClient = self.session or httpx.AsyncClient()
-        images_urls: list[str] = await chapter.get_images(session)
+        images_urls: list[str] = await chapter.get_images(self._session)
 
         with typer.progressbar(length=len(images_urls)) as progress:
             res: list[httpx.Response] = await asyncio.gather(
-                *[self._call(url, session, sema, progress) for url in images_urls]
+                *[self._call(url, self._session, sema, progress) for url in images_urls]
             )
-        if not self.session:
-            await session.aclose()
 
         output.mkdir(parents=True, exist_ok=True)
         with ZipFile(output / f"{chapter.name}.cbz", "w") as zip_file:
@@ -85,16 +82,13 @@ class Client:
         """
 
         pattern: re.Pattern[str] = re.compile(r"[^a-zA-Z0-9-]")
-        session: httpx.AsyncClient = self.session or httpx.AsyncClient()
         res: httpx.Response = await self._call(
-            urljoin(self.base_url, f"rss/{pattern.sub(' ', name)}.xml"), session
+            urljoin(self.base_url, f"rss/{pattern.sub(' ', name)}.xml"), self._session
         )
         try:
             res.raise_for_status()
         except httpx.HTTPError:
             raise MangaNotFound(name)
-        if not self.session:
-            await session.aclose()
 
         xml: etree._Element = etree.fromstring(res.text)
         return [
@@ -108,8 +102,7 @@ class Client:
     async def close(self) -> None:
         """Close the client."""
 
-        if self.session:
-            await self.session.aclose()
+        await self._session.aclose()
 
     async def __aenter__(self) -> "Client":
         """Enter the client.
@@ -118,7 +111,6 @@ class Client:
             Client: The client object.
         """
 
-        self.session = httpx.AsyncClient()
         return self
 
     async def __aexit__(
@@ -135,7 +127,6 @@ class Client:
             exc_tb ([type]): [description]
         """
 
-        if exc_type:
-            await self.close()
-            raise exc_type(exc_val, exc_tb)
         await self.close()
+        if exc_type:
+            raise exc_type(exc_val, exc_tb)

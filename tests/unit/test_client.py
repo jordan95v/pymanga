@@ -51,7 +51,7 @@ class TestClient:
     async def test__aenter__(self) -> None:
         async with Client() as client:
             assert isinstance(client, Client)
-            assert isinstance(client.session, httpx.AsyncClient)
+            assert isinstance(client._session, httpx.AsyncClient)
 
     @pytest.mark.parametrize("throwable", [None, MangaNotFound])
     async def test__aexit__(
@@ -68,7 +68,7 @@ class TestClient:
 
     async def test_close(self, mocker: MockerFixture) -> None:
         close_spy: MagicMock = mocker.spy(httpx.AsyncClient, "aclose")
-        client: Client = Client(session=httpx.AsyncClient())
+        client: Client = Client()
         await client.close()
         close_spy.assert_called_once()
 
