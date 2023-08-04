@@ -94,11 +94,6 @@ Before submitting a pull request, make sure to run the tests and ensure that you
 
 `pymanga` is open-source software released under the [MIT License](https://opensource.org/license/mit/). Feel free to use, modify, and distribute it according to the terms of the license.
 
-# Acknowledgements
-
-This project was developed by [jordan95v](https://github.com/jordan95v).<br>
-I would like to thank the NewsAPI team for providing a powerful and comprehensive news service, making it easier for developers to integrate news data into their applications.
-
 <h1>Thanks you for reading me and using <b>pymanga</b>!</h1>
 
 <img src="https://media.tenor.com/pGx47sxMo4gAAAAC/bye-goodbye.gif" width="100%">
