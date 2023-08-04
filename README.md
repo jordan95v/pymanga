@@ -7,6 +7,18 @@ If you enjoy the content, be sure to check out the original website and obviousl
 
 <img src="https://media.tenor.com/Dx7Ek15cLFEAAAAC/bleach-anime.gif" width="100%">
 
+<h1>Table of contents</h1>
+
+- [Code structure](#code-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Get manga chapters](#get-manga-chapters)
+  - [Download a chapter](#download-a-chapter)
+- [Commands](#commands)
+- [Contributing](#contributing)
+- [License](#license)
+
+
 # Code structure
 
 `pymanga` is a simple project, so the code structure is pretty simple too.
@@ -51,18 +63,6 @@ This is because the http session needs to be closed at the end of the program, s
 However, if you want to use the client outside of a context manager, you can do it like this:
 
 ```python
-from pymanga import Client
-
-async def main() -> None:
-    client = Client()
-    # Do stuff with the client
-```
-This is going to impact performance a little bit, because it's going to create an `httpx.AsyncClient` for every request.
-
-You can also pass a custom `httpx.AsyncClient` to the client, like this:
-Be sure to call the `close` method of the client at the end of the program, or you will have a memory leak.
-
-```python
 import httpx
 from pymanga import Client
 
@@ -72,8 +72,40 @@ async def main() -> None:
     await client.close()
 ```
 
+Be sure to call the `close` method of the client at the end of the program, or you will have a memory leak.
+
 If you do not find a manga, please go on [mangasee](https://mangasee123.com/) and check if the manga is there.<br>
 If it is, please go grab the manga's name in the RSS url and retry.
+
+## Get manga chapters
+
+The client comes with `get_chapters` method that returns a list of `Chapter` objects.
+
+```python
+from pymanga import Client
+
+async def main() -> None:
+    async with Client() as client:
+        chapters = await client.get_chapters("bleach")
+        print(chapters)
+```
+
+## Download a chapter
+
+The client comes with a `download_chapter` method that will download the chapter in the current directory.
+The method takes a `Chapter` object as argument. I made it in the client to unify the http session used.
+
+```python
+from pathlib import Path
+from pymanga import Client
+
+async def main() -> None:
+    async with Client() as client:
+        chapters = await client.get_chapters("bleach")
+        output: Path = Path.cwd() / "bleach"
+        limit: int = 10 # Limit the number of images downloaded concurrently
+        await client.download_chapter(chapters[0], output, limit)
+```
 
 # Commands
 
