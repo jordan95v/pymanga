@@ -10,6 +10,7 @@ import httpx
 import typer
 from lxml import etree
 from rich.progress_bar import ProgressBar
+from rich.progress import track, Progress, TaskID
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
 
@@ -26,7 +27,7 @@ class Client:
         url: str,
         session: httpx.AsyncClient,
         sema: asyncio.Semaphore | None = None,
-        progress: ProgressBar | None = None,
+        progress: Progress | None = None,
     ) -> httpx.Response:
         """Make a request to a url.
 
@@ -38,8 +39,9 @@ class Client:
         """
 
         await sema.acquire() if sema else None
+        progress.console.print(f"Downloading {url}") if progress else None
         res: httpx.Response = await session.get(url)
-        progress.update(1) if progress else None
+        progress.update(progress.tasks[0].id, advance=1) if progress else None
         sema.release() if sema else None
         return res
 
@@ -57,7 +59,10 @@ class Client:
         sema: asyncio.Semaphore = asyncio.Semaphore(limit)
         images_urls: list[str] = await chapter.get_images(self._session)
 
-        with typer.progressbar(length=len(images_urls)) as progress:
+        with Progress() as progress:
+            progress.add_task(
+                "[bold green]Downloading...[/bold green]", total=len(images_urls)
+            )
             res: list[httpx.Response] = await asyncio.gather(
                 *[self._call(url, self._session, sema, progress) for url in images_urls]
             )
