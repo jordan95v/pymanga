@@ -7,10 +7,8 @@ from typing import ClassVar, Type
 from urllib.parse import urljoin
 from zipfile import ZipFile
 import httpx
-import typer
 from lxml import etree
-from rich.progress_bar import ProgressBar
-from rich.progress import track, Progress, TaskID
+from rich.progress import Progress
 from pymanga.models import Chapter
 from pymanga.utils.exceptions import MangaNotFound
 
