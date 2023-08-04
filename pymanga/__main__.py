@@ -14,13 +14,13 @@ def main(
     manga_name: Annotated[str, typer.Argument(help="Name of the manga.")],
     output: Annotated[Path, typer.Option(help="Output directory.")] = Path.cwd(),
     from_: Annotated[
-        int,
+        int | None,
         typer.Argument(
             help="Download from this chapter.", rich_help_panel="Secondary arguments"
         ),
     ] = None,
     to: Annotated[
-        int,
+        int | None,
         typer.Argument(
             help="End download to this chapter.", rich_help_panel="Secondary arguments"
         ),
