@@ -11,16 +11,27 @@ from pymanga.utils.exceptions import ChapterError, ChapterNotFound
 @pytest.mark.asyncio
 class TestChapter:
     @pytest.mark.parametrize(
-        "status_code, throwable",
+        "status_code, imgs, expected, throwable",
         [
-            (200, False),
-            (404, ChapterNotFound),
+            (
+                200,
+                ["0001-001.png", "0001-002.png"],
+                [
+                    "https://fake_url/manga/fake/0001-001.png",
+                    "https://fake_url/manga/fake/0001-002.png",
+                ],
+                None,
+            ),
+            (200, [], [], None),
+            (404, [], None, ChapterNotFound),
         ],
     )
     async def test_get_images(
         self,
         chapter: Chapter,
         mocker: MockerFixture,
+        imgs: list[str],
+        expected: list[str] | None,
         status_code: int,
         throwable: Type[Exception],
     ) -> None:
@@ -38,18 +49,11 @@ class TestChapter:
                 await chapter.get_images(session)
         else:
             mocker.patch.object(
-                chapter, "_parse_html", return_value=(2, "", "fake_url")
+                chapter, "_parse_html", return_value=(len(imgs), "", "fake_url")
             )
-            mocker.patch.object(
-                chapter,
-                "_get_number_path",
-                side_effect=["0001-001.png", "0001-002.png"],
-            )
-            imgs: list[str] = await chapter.get_images(session)
-            assert imgs == [
-                "https://fake_url/manga/fake/0001-001.png",
-                "https://fake_url/manga/fake/0001-002.png",
-            ]
+            mocker.patch.object(chapter, "_get_number_path", side_effect=imgs)
+            ret: list[str] = await chapter.get_images(session)
+            assert ret == expected
         await session.aclose()
 
     @pytest.mark.parametrize(

@@ -18,7 +18,6 @@ If you enjoy the content, be sure to check out the original website and obviousl
 - [Contributing](#contributing)
 - [License](#license)
 
-
 # Code structure
 
 `pymanga` is a simple project, so the code structure is pretty simple too.
