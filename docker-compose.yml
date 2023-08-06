@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  pymanga:
+    container_name: pymanga
+    build: .
+    volumes:
+      - ./output:/app/output

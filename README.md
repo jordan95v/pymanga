@@ -15,6 +15,7 @@ If you enjoy the content, be sure to check out the original website and obviousl
   - [Get manga chapters](#get-manga-chapters)
   - [Download a chapter](#download-a-chapter)
 - [Commands](#commands)
+- [Docker](#docker)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -112,9 +113,25 @@ async def main() -> None:
 
 ```bash
 (venv) $ python -m pymanga --help
+
+# Download chapters 2 to 5 of Bleach in ./pymanga-output directory
+(venv) $ python -m pymanga Bleach 2 5 --output ./pymanga-output
 ```
 
 That will show you all the available commands and options.
+
+# Docker
+
+`pymanga` also comes with docker implementation.
+
+```bash
+$ docker compose up
+
+# Download chapters 2 to 5 of Bleach
+$ docker exec pymanga python -m pymanga Bleach 2 5 --output /app/output
+```
+
+`/app/output` is linked to your local directory `./output` that was created with the first docker command.
 
 # Contributing
 
