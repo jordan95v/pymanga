@@ -22,12 +22,13 @@ async def handle(
         print(f"Downloading [green]{len(chapters)}[/green] chapters ...\n")
 
         for chapter in chapters:
-            print(f"[bold]Downloading[/bold] [blue]{chapter.name}[/blue]")
-            await client.download_chapter(chapter, output, 3)
-            print(
-                f"[bold green]Downloaded[/bold green]"
-                f" [blue]{chapter.name}[/blue] to [yellow]{output}[/yellow] !\n"
-            )
+            if not Path(f"{output}/{chapter.name}.cbz").exists():
+                print(f"[bold]Downloading[/bold] [blue]{chapter.name}[/blue]")
+                await client.download_chapter(chapter, output, 3)
+                print(
+                    f"[bold green]Downloaded[/bold green]"
+                    f" [blue]{chapter.name}[/blue] to [yellow]{output}[/yellow] !\n"
+                )
 
 
 @app.command()
